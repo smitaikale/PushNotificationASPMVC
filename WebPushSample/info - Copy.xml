@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<PushInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <VapidPublic>BDFCbi2rXSTRv9StMY5782X_WgqibTuvnktx3Ukz4zljZWnrjaHZR4n6u5VCjSrLUj2oA7FkYgB7Ouj6bea-fuw</VapidPublic>
+  <VapipPrivate>566XUtk8lFFMKFzGgaxC4eJNX7680uOMpP1jvk_ssvc</VapipPrivate>
+  <Targets>
+    <NotificationTarget>
+      <EndPoint>https://fcm.googleapis.com/fcm/send/cVJ_RvIG0Ws:APA91bEhrxJ5W8RLXyJM1JKUYO41CKdiiTkp10QG3tgpZseCPtn0CgT1EcKLLR7GqRbrvHL7fjKjgcidF2a4FAGZ-rAH20rHVWBMEeEvmA37pqnW7N3qD8W00U9q9OP6VyEng_L0gSVs</EndPoint>
+      <PublicKey>BE0-OB46mrflEft62Dv5aQce46vd0tUJqSjbSy99wIq9vAzjGOcIJk5DaZHiS7wLlJ9Ag6AEb3ERGSUqFeOyzhk</PublicKey>
+      <AuthSecret>3VD469e2KSBlgg7ZvUn6fA</AuthSecret>
+      <ContentEncoding>aes128gcm</ContentEncoding>
+    </NotificationTarget>
+  </Targets>
+</PushInformation>

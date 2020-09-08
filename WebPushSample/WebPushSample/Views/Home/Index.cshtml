@@ -1,0 +1,127 @@
+﻿@model WebPushSample.Models.HomeModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
+    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Getting started</h2>
+        <p>
+            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
+            enables a clean separation of concerns and gives you full control over markup
+            for enjoyable, agile development.
+        </p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Get more libraries</h2>
+        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Web Hosting</h2>
+        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+	debugger;
+        var vapidKey = "@Model.VapidPublic";
+        var data = "@Model.Data";
+
+        function urlB64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/\-/g, '+')
+                .replace(/_/g, '/');
+
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        // 上の逆のしょり
+        function uint8ArrayToUrlB64(buffer) {
+            return window.btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+        }
+
+
+        // 開いたら通知の許可を聞いてくるクソページを作る
+        $(document)
+            .ready(function() {
+			
+			
+                if ("serviceWorker" in navigator) {
+                    Notification.requestPermission(state => {
+                        if (state === 'granted') {
+                            navigator.serviceWorker.register('/sw.js')
+                                .then(function(swRegistration) {
+                                    swRegistration.pushManager.getSubscription()
+                                        .then(function(subscription) {
+										alert(JSON.stringify(subscription));
+                                            if (subscription === null) {
+                                                navigator.serviceWorker.ready
+                                                    .then(registration => {
+                                                        return registration.pushManager.subscribe({
+                                                            userVisibleOnly: true,
+                                                            applicationServerKey: urlB64ToUint8Array(vapidKey)
+                                                        }).then(subscription => {
+                                                            let contentEncoding;
+                                                            if ('supportedContentEncodings' in PushManager) {
+                                                                contentEncoding =
+                                                                    PushManager.supportedContentEncodings.includes(
+                                                                        'aes128gcm')
+                                                                    ? 'aes128gcm'
+                                                                    : 'aesgcm';
+                                                            } else {
+                                                                contentEncoding = 'aesgcm';
+                                                            }
+
+                                                            // パラメータをアプリケーションサーバに送信
+                                                            $.ajax({
+                                                                type: 'POST',
+                                                                url: "/api/subscribe",
+                                                                data: {
+                                                                    endPoint: subscription.endpoint,
+                                                                    publicKey: uint8ArrayToUrlB64(
+                                                                        subscription.getKey('p256dh')),
+                                                                    authSecret: uint8ArrayToUrlB64(
+                                                                        subscription.getKey('auth')),
+                                                                    contentEncoding: contentEncoding
+																	
+                                                                }
+																
+                                                            });
+                                                        }).catch(function(error) {
+                                                            console.error("Service Worker subscribe failed: ", error);
+                                                        });
+                                                    });
+                                            }
+                                        });
+                                })
+                        .catch(function(error) {
+                        console.error("Service Worker registration failed: ", error);
+                    });
+                }
+            });
+                }
+
+                if (data) alert(data);
+    });
+    </script>
+}
